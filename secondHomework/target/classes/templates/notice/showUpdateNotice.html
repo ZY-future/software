@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>人事管理系统 ——后台管理</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta http-equiv="expires" content="0"/>
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3"/>
+    <meta http-equiv="description" content="This is my page"/>
+    <link th:href="@{../css/css.css}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" th:href="@{../js/ligerUI/skins/Aqua/css/ligerui-dialog.css}"/>
+    <link th:href="@{../js/ligerUI/skins/ligerui-icons.css}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link th:href="@{../css/css.css}" href="../css/css.css" type="text/css" rel="stylesheet"/>
+    <link th:href="@{../css/pager.css}" href="../css/pager.css" type="text/css" rel="stylesheet"/>
+    <script type="text/javascript" th:src="@{../js/jquery-1.11.0.js}" src="../js/jquery-1.11.0.js"></script>
+    <script type="text/javascript" th:src="@{../js/jquery-migrate-1.2.1.js}"
+            src="../js/jquery-migrate-1.2.1.js"></script>
+    <link th:href="@{../js/ligerUI/skins/Aqua/css/ligerui-dialog.css}"
+          href="../js/ligerUI/skins/Aqua/css/ligerui-dialog.css" rel="stylesheet" type="text/css"/>
+    <script th:src="@{../js/ligerUI/js/core/base.js}" src="../js/ligerUI/js/core/base.js"
+            type="text/javascript"></script>
+    <script th:src="@{../js/ligerUI/js/plugins/ligerDialog.js}" src="../js/ligerUI/js/plugins/ligerDialog.js"
+            type="text/javascript"></script>
+    <script th:src="@{../js/ligerUI/js/plugins/ligerDrag.js}" src="../js/ligerUI/js/plugins/ligerDrag.js"
+            type="text/javascript"></script>
+    <script th:src="@{../js/ligerUI/js/plugins/ligerResizable.js}" src="../js/ligerUI/js/plugins/ligerResizable.js"
+            type="text/javascript"></script>
+    <script th:inline="javascript">
+
+        function resetValue(id) {
+            $.ajax({
+                type: "post",
+                url: "/notice/showUpdateReset?notice_id=" + id,
+                // data:data,
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $.ligerDialog.error("出错了，请于管理员联系");
+                },
+                success: function (json) { // 此处的json是返回的数据
+                    $("#title").val(json.title);
+                    $("#content").val(json.content);
+                }
+            });
+        }
+
+        function submit() {
+            var title = $("#title");
+            var content = $("#content");
+            var id = $("#notice_id");
+            var msg = "";
+            if ($.trim(title.val()) == "") {
+                msg = "公告标题不能为空！";
+                title.focus();
+            } else if ($.trim(title.val()).length <= 2) {
+                msg = "请输入两个字符以上的标题！";
+                title.focus();
+            } else if ($.trim(content.val()) == "") {
+                msg = "公告内容不能为空！";
+                content.focus();
+            }
+            if (msg != "") {
+                $.ligerDialog.error(msg);
+                return false;
+            } else {
+                var data = "?title=" + title.val() + "&content=" + content.val() + "&id=" + id.val();
+                $.ajax({
+                    type: "post",
+                    url: "/notice/updateNotice" + data,
+                    // data:data,
+                    contentType: "application/json;charset=UTF-8",
+                    // dataType:"json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $.ligerDialog.error("出错了，请于管理员联系");
+                    },
+                    success: function (json) { // 此处的json是返回的数据
+                        $.ligerDialog.alert("修改成功");
+                    }
+                });
+            }
+        }
+
+
+    </script>
+</head>
+<body>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td height="10"></td>
+    </tr>
+    <tr>
+        <td width="15" height="32"></td>
+        <td class="">
+            <div class="form-horizontal">
+                <span><img src="../images/current_pos.png"></span>
+                <span class="font-weight-bolde">当前位置:</span>
+                <span class="badge badge-pill badge-dark">公告管理</span>
+                <span class="font-weight-bolde"> > </span>
+                <span class="badge badge-pill badge-secondary">修改公告</span>
+            </div>
+        </td>
+        <td width="15" height="32"></td>
+    </tr>
+</table>
+
+<!-- 请求异常错误  -->
+<table width="100%" height="90%" border="0" cellpadding="10" cellspacing="0" class="main_tabbor">
+    <tr valign="top">
+        <td>
+
+            <!-- 隐藏表单，flag表示添加标记 -->
+            <input type="hidden" name="flag" value="2">
+            <input type="hidden" name="id" id="notice_id" th:value="${notice.notice_id }">
+            <table width="100%" border="0" cellpadding="0" cellspacing="10" class="main_tab">
+                <tr>
+                    <td class="font3 fftd">
+                        <!--                        公告标题：-->
+                        <!--                        <input type="text" name="title" size="30" id="title" th:value="${notice.notice_title}"/>-->
+                        <!--                        <span style="color: #ff0000;"></span>-->
+                        <div class="input-group input-group-sm mb-3 w-25"
+                             style="margin-left: 600px;margin-right: 250px">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text shadow" id="inputGroup-sizing-sm1">公告标题</span>
+                            </div>
+                            <input type="text" name="title" id="title" th:value="${notice.notice_title}"
+                                   class="form-control shadow" aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="main_tdbor"></td>
+                </tr>
+
+                <tr>
+                    <!--                    <td class="font3 fftd">公告内容：<br/>-->
+                    <!--                        <textarea name="content" cols="88" rows="11" id="content"-->
+                    <!--                                  th:text="${notice.notice_content}"></textarea>-->
+                    <!--                    </td>-->
+                    <td class="font3 fftd">公告内容：<br/>
+                        <!--                        <textarea name="content" id="content" cols="88" rows="11" ></textarea>-->
+                        <div class="form-group" style="margin-left: 250px;margin-right: 250px">
+                            <textarea name="content" id="content" class="form-control shadow"
+                                      th:text="${notice.notice_content}" rows="10"></textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="main_tdbor"></td>
+                </tr>
+
+                <tr>
+                    <td class="font3 fftd">
+                        <!--                        <input type="button" onclick="submit()" value="修改">-->
+                        <!--                        <input type="button" th:onclick="'resetValue(' + ${notice.notice_id} + ')'" value="重置">-->
+                        <button type="button" onclick="submit()" class="btn btn-success btn-sm shadow" id="upload">修改
+                        </button>
+                        <button type="button" th:onclick="'resetValue(' + ${notice.notice_id} + ')'"
+                                class="btn btn-warning btn-sm shadow" id="reset">重置
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="main_tdbor"></td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+<div style="height:10px;"></div>
+</body>
+</html>
